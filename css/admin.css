@@ -1,3 +1,32 @@
-/* admin.css */
+.cus-input-outline {
+    border: 1px solid #ccc !important;
+    padding: 5px 10px !important;
+    border-radius: 4px !important;
+}
 
-/* This file is intentionally left blank. Specific styles for the admin page will be added as needed. */
+/* Default styles */
+.data-table td,
+.data-table th {
+    padding: 15px;
+    font-size: 16px;
+}
+
+/* Styles for viewports less than 600px wide */
+@media (max-width: 600px) {
+
+    .data-table td,
+    .data-table th {
+        padding: 10px;
+        font-size: 14px;
+    }
+}
+
+/* Styles for viewports less than 400px wide */
+@media (max-width: 400px) {
+
+    .data-table td,
+    .data-table th {
+        padding: 5px;
+        font-size: 12px;
+    }
+}

@@ -85,7 +85,7 @@
                             <!-- messagebar resizable textarea -->
                             <textarea class="resizable" placeholder="メッセージ"></textarea>
                         </div>
-                        <a href="#" class="link icon-only">
+                        <a id="send-btn" href="" class="link icon-only">
                             <i class="icon f7-icons">arrow_up_circle_fill</i>
                         </a>
                     </div>
@@ -95,17 +95,20 @@
             </div>
         </div>
     </div>
-    <!-- Path to Framework7 Library Bundle JS-->
+    <!-- Path to Framework7 Library Bundle JS -->
     <script type="text/javascript" src="js/lib/framework7-bundle.min.js"></script>
-    <!-- Path to your app js-->
-    <script type="text/javascript" src="js/index.js"></script>
-    <script type="text/javascript" src="js/admin.js"></script>
-    <script type="text/javascript" src="js/controller/main.js"></script>
+    <!-- RakutenMA Library -->
     <script type="text/javascript" src="js/lib/rakutenma/rakutenma.js"></script>
     <script type="text/javascript" src="js/lib/rakutenma/hanzenkaku.js"></script>
     <script type="text/javascript" src="js/lib/rakutenma/model_ja.js"></script>
-    <script type="text/javascript" src="js/model/indexedDB.js"></script>
+    <!-- Custom JS -->
+    <script type="text/javascript" src="js/index.js"></script>
+    <script type="text/javascript" src="js/admin.js"></script>
+    <script type="text/javascript" src="js/controller/main.js"></script>
+    <script type="text/javascript" src="js/model/tokenizer.js"></script>
+    <script type="text/javascript" src="js/model/chatbotIndexedDB.js"></script>
     <script type="text/javascript" src="js/model/chatbot.js"></script>
+    <script type="text/javascript" src="js/helpers/utils.js"></script>
 </body>
 
 </html>

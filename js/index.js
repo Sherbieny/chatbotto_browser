@@ -1,66 +1,74 @@
-var app = new Framework7({
-    // App root element
-    el: '#app',
-    // App Name
-    name: 'チャットボット',
-    // Enable swipe panel
-    panel: {
-        swipe: true,
-    },
-    // Add default routes
-    routes: [
-        {
-            name: 'admin',
-            path: '/admin/',
-            url: './admin.html',
+let app, mainView, suggestionsSheet, messages, messageBar, sendBtn, db, chatbot, $$;
+
+document.addEventListener('DOMContentLoaded', async function () {
+    app = new Framework7({
+        // App root element
+        el: '#app',
+        // App Name
+        name: 'チャットボット',
+        // Enable swipe panel
+        panel: {
+            swipe: true,
         },
-    ],
-    // suggestions sheet modal
-    sheet: {
-        el: '#suggestions-sheet',
-        backdrop: true,
-        swipeToClose: true,
-        closeByOutsideClick: true,
-    },
-
-
-});
-
-
-var mainView = app.views.create('.view-main');
-var suggestionsSheet = app.sheet.get('#suggestions-sheet');
-var messages = app.messages.create({
-    el: '.messages',
-    messages: [
-        {
-            text: 'こんにちは！本日はどのようにお手伝いできますか？',
-            type: 'sent',
-            avatar: 'img/chatbot_icon_1.png'
+        // Add default routes
+        routes: [
+            {
+                name: 'admin',
+                path: '/admin/',
+                url: './admin.html',
+            },
+        ],
+        // suggestions sheet modal
+        sheet: {
+            el: '#suggestions-sheet',
+            backdrop: true,
+            swipeToClose: true,
+            closeByOutsideClick: true,
         },
-        {
-            text: 'こんにちは！',
-            type: 'received',
-            avatar: 'img/user_icon.png'
-        },
-    ],
-    firstMessageRule: function (message, previousMessage, nextMessage) {
-        if (message.isTitle) return false;
-        if (!previousMessage || previousMessage.type !== message.type || previousMessage.name !== message.name) return true;
-        return false;
-    },
-    lastMessageRule: function (message, previousMessage, nextMessage) {
-        if (message.isTitle) return false;
-        if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name) return true;
-        return false;
-    },
-    tailMessageRule: function (message, previousMessage, nextMessage) {
-        if (message.isTitle) return false;
-        if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name) return true;
-        return false;
+    });
+
+    $$ = Dom7;
+    mainView = app.views.create('.view-main');
+    suggestionsSheet = app.sheet.get('#suggestions-sheet');
+    messages = app.messages.create({
+        el: '.messages',
+        messages: [
+            {
+                text: 'こんにちは！本日はどのようにお手伝いできますか？',
+                type: 'sent',
+                avatar: 'img/chatbot_icon_1.png'
+            },
+            {
+                text: 'こんにちは！',
+                type: 'received',
+                avatar: 'img/user_icon.png'
+            },
+        ]
+    });
+    messageBar = app.messagebar.create({
+        el: '.messagebar',
+        attachments: [],
+    });
+
+    try {
+        // Initialize IndexedDB
+        const chatbotDB = new ChatbotIndexedDB();
+        await chatbotDB.init();
+        db = chatbotDB;
+    } catch (error) {
+        console.error('Failed to initialize database:', error);
+        // Show a notification to the user
+        app.notification.create({
+            title: 'チャットボット',
+            text: 'データベースの初期化に失敗しました。機能が制限される可能性があります。',
+            closeTimeout: 3000,
+        }).open();
     }
 
-});
-var messageBar = app.messagebar.create({
-    el: '.messagebar',
-    attachments: [],
+    // Initialize Chatbot
+    chatbot = new Chatbot(app, db);
+
+    //Dom Elements
+    sendBtn = document.getElementById('send-btn');
+
 });
