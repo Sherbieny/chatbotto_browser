@@ -27,20 +27,90 @@ class ChatbotIndexedDB {
         });
     }
 
-    async saveChatbotData(data, key) {
+    async saveChatbotData(data) {
         return new Promise((resolve, reject) => {
             try {
                 const transaction = this.db.transaction(['chatbotDataStore'], 'readwrite');
                 const store = transaction.objectStore('chatbotDataStore');
 
                 // Delete the old data with the same key
-                store.delete(key);
+                store.delete('qa');
 
                 // Save the entire data array as a single record with the provided key
-                store.put({ id: key, data: data });
+                store.put({ id: 'qa', data: data });
 
                 transaction.oncomplete = function () {
                     console.log('Chatbot data saved to IndexedDB');
+                    resolve();
+                };
+
+                transaction.onerror = function () {
+                    reject(new Error("An error occurred while saving data to IndexedDB"));
+                };
+
+            } catch (error) {
+                console.error(error);
+                reject(new Error('An unexpected error occurred: ' + error));
+            }
+        });
+    }
+
+    async saveWeightsData(data) {
+        return new Promise((resolve, reject) => {
+            try {
+                const transaction = this.db.transaction(['chatbotDataStore'], 'readwrite');
+                const store = transaction.objectStore('chatbotDataStore');
+
+                // Get the existing record with the key 'weights'
+                const getRequest = store.get('weights');
+                getRequest.onsuccess = function () {
+                    const record = getRequest.result;
+                    if (record) {
+                        // Update the value field of each item in the record's data array
+                        for (let item of data) {
+                            const existingItem = record.data.find(x => x.key === item.key);
+                            if (existingItem) {
+                                existingItem.value = item.value;
+                            }
+                        }
+                        // Save the updated record back to the store
+                        store.put(record);
+                    } else {
+                        // If no existing record, save the entire data array as a single record with the key 'weights'
+                        store.put({ id: 'weights', data: data });
+                    }
+                };
+
+                transaction.oncomplete = function () {
+                    console.log('Weights data saved to IndexedDB');
+                    resolve();
+                };
+
+                transaction.onerror = function () {
+                    reject(new Error("An error occurred while saving data to IndexedDB"));
+                };
+
+            } catch (error) {
+                console.error(error);
+                reject(new Error('An unexpected error occurred: ' + error));
+            }
+        });
+    }
+
+    async saveTokenizedChatbotPromptsData(data) {
+        return new Promise((resolve, reject) => {
+            try {
+                const transaction = this.db.transaction(['chatbotDataStore'], 'readwrite');
+                const store = transaction.objectStore('chatbotDataStore');
+
+                // Delete the old data with the same key
+                store.delete('tokenizedChatbotPrompts');
+
+                // Save the entire data array as a single record with the provided key
+                store.put({ id: 'tokenizedChatbotPrompts', data: data });
+
+                transaction.oncomplete = function () {
+                    console.log('Tokenized chatbot prompt data saved to IndexedDB');
                     resolve();
                 };
 
@@ -64,8 +134,12 @@ class ChatbotIndexedDB {
 
                 request.onsuccess = function (event) {
                     const data = event.target.result;
-                    console.log('Chatbot data retrieved from IndexedDB');
-                    resolve(data.data);
+                    if (data === undefined) {
+                        reject(new Error(`No data found for key: ${key}`));
+                    } else {
+                        console.log('Chatbot data retrieved from IndexedDB');
+                        resolve(data.data);
+                    }
                 };
 
                 request.onerror = function (event) {

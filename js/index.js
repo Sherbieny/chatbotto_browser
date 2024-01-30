@@ -1,6 +1,10 @@
-let app, mainView, suggestionsSheet, messages, messageBar, sendBtn, db, chatbot, $$;
+let app, mainView, suggestionsSheet, messages, messageBar, db, chatbot, $$;
+let lastMessageTime = 0;
+let typingTimeout; // Rate limit in milliseconds
+let userInputLimit = 200; // Maximum length of user input
 
 document.addEventListener('DOMContentLoaded', async function () {
+
     app = new Framework7({
         // App root element
         el: '#app',
@@ -21,15 +25,23 @@ document.addEventListener('DOMContentLoaded', async function () {
         // suggestions sheet modal
         sheet: {
             el: '#suggestions-sheet',
-            backdrop: true,
+            backdrop: false,
             swipeToClose: true,
             closeByOutsideClick: true,
         },
+        // loader
+        dialog: {
+            preloaderTitle: '読み込み中...',
+            progressTitle: '読み込み中...',
+            buttonOk: 'OK',
+        },
     });
+
+    showSpinner();
 
     $$ = Dom7;
     mainView = app.views.create('.view-main');
-    suggestionsSheet = app.sheet.get('#suggestions-sheet');
+    suggestionsSheet = app.sheet.create({ el: '#suggestions-sheet' });
     messages = app.messages.create({
         el: '.messages',
         messages: [
@@ -67,8 +79,44 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Initialize Chatbot
     chatbot = new Chatbot(app, db);
+    await chatbot.init();
+
 
     //Dom Elements
-    sendBtn = document.getElementById('send-btn');
+    const sendBtn = document.getElementById('send-btn');
+    const meesageField = document.getElementById('message-field');
+
+    //Event Listeners
+
+    // Send message
+    sendBtn.addEventListener('click', function () {
+        const userInput = meesageField.value;
+        if (userInput.length === 0) {
+            return;
+        }
+        chatbot.answer(userInput)
+    });
+    meesageField.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            const userInput = meesageField.value;
+            if (userInput.length === 0) {
+                return;
+            }
+            chatbot.answer(userInput)
+        }
+    });
+
+    // Finished typing - add suggestions
+    meesageField.addEventListener('change', function (e) {
+        clearTimeout(typingTimeout);
+
+        if (this.value.length > 0) {
+            typingTimeout = setTimeout(() => {
+                chatbot.addSuggestions(this.value);
+            }, 2000);
+        }
+    });
+
+    hideSpinner();
 
 });

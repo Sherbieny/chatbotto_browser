@@ -1,4 +1,4 @@
-const TOKENIZED_QUESTION_DB_KEY = 'tokenizedChatbotQA';
+const TOKENIZED_PROMPTS_DB_KEY = 'tokenizedChatbotPrompts';
 /**
 * RakutenMA Tokenizer response PoS tags
 * @see
@@ -49,6 +49,7 @@ class Tokenizer {
     constructor(chatbotDBInstance) {
         this.rakutenma = null;
         this.weightMap = null;
+        this.tokenizedPrompts = null;
         this.db = chatbotDBInstance;
     }
 
@@ -64,7 +65,9 @@ class Tokenizer {
                 this.rakutenma = new RakutenMA(model_ja);
                 this.rakutenma.featset = RakutenMA.default_featset_ja;
                 this.rakutenma.hash_func = RakutenMA.create_hash_func(15);
-                this.weightMap = weightMap;
+                this.weightMap = weightMap
+                await this.updateWeights();
+                await this.tokenizeChatbotPrompts();
                 resolve();
             } catch (e) {
                 reject(e);
@@ -72,34 +75,61 @@ class Tokenizer {
         });
     }
 
-    async tokenizeChatbotQuestions() {
+    async updateWeights() {
+        // Get the latest weights from IndexedDB
+        const weights = await this.db.getChatbotData('weights');
+        if (weights) {
+            //take key and value from weights array of objects
+            const weightMap = weights.reduce((map, obj) => {
+                map[obj.key] = obj.value;
+                return map;
+            }, {});
+            this.weightMap = weightMap;
+        }
+    }
+
+    getWeightsMap() {
+        return this.weightMap;
+    }
+
+    async tokenizeChatbotPrompts() {
         if (!this.rakutenma) {
             await this.init();
         }
 
         // check if tokenized questions are already in IndexedDB
-        let tokenizedChatbotQA = await this.db.getDataByKey(TOKENIZED_QUESTION_DB_KEY);
-        if (tokenizedChatbotQA) {
-            return;
+        let tokenizedChatbotPrompts;
+        try {
+            tokenizedChatbotPrompts = await this.db.getChatbotData(TOKENIZED_PROMPTS_DB_KEY);
+            if (tokenizedChatbotPrompts) {
+                this.tokenizedPrompts = tokenizedChatbotPrompts;
+                return;
+            }
+        } catch (e) {
+            console.log(e);
         }
 
-        const questions = await this.db.getChatbotQuestions();
-        tokenizedChatbotQA = questions.map(question => {
-            const tokens = this.tokenizeString(question);
+
+        const prompts = await this.db.getChatbotData('qa').then(data => {
+            return data.map(item => item.prompt);
+        });
+        tokenizedChatbotPrompts = prompts.map(prompt => {
+            const tokens = this.tokenizeString(prompt);
             return tokens;
         });
 
         // Save tokenized questions to IndexedDB
-        await saveDataByKey(TOKENIZED_QUESTION_DB_KEY, tokenizedChatbotQA);
+        await this.db.saveTokenizedChatbotPromptsData(tokenizedChatbotPrompts);
+
+        this.tokenizedPrompts = tokenizedChatbotPrompts;
     }
 
-    async getTokenizedQuestions() {
-        let tokenizedChatbotQA = await getDataByKey(TOKENIZED_QUESTION_DB_KEY);
-        if (!tokenizedChatbotQA) {
-            await this.tokenizeChatbotQuestions();
-            tokenizedChatbotQA = await getDataByKey(TOKENIZED_QUESTION_DB_KEY);
+    async getTokenizedPrompts() {
+        if (!this.tokenizedPrompts) {
+            await this.tokenizeChatbotPrompts();
         }
-        return tokenizedChatbotQA;
+
+        return this.tokenizedPrompts;
     }
 
     tokenizeString(input) {

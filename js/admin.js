@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const uploadQABtn = document.getElementById('csv-upload-qa');
         const tablePrevBtn = document.getElementById('prev-page');
         const tableNextBtn = document.getElementById('next-page');
+        const tablePageCountSelect = document.getElementById('page-count-select');
+        const saveTableDataBtn = document.getElementById('save-table-data');
+
         uploadWeightsBtn.addEventListener('change', function (event) {
             const file = event.target.files[0];
             const reader = new FileReader();
@@ -29,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 try {
                     // validate data
                     validateData(data, 'weights');
-                    await db.saveChatbotData(data, 'weights');
+                    await db.saveWeightsData(data);
                     // Send notification
                     app.notification.create({
                         title: 'チャットボット',
@@ -69,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 try {
                     // validate data
                     validateData(data, 'qa');
-                    await db.saveChatbotData(data, 'qa');
+                    await db.saveChatbotData(data);
                     // Send notification
                     app.notification.create({
                         title: 'チャットボット',
@@ -85,6 +88,38 @@ document.addEventListener('DOMContentLoaded', function () {
             };
         });
 
+        // Save table data
+        saveTableDataBtn.addEventListener('click', async function () {
+            const table = document.getElementById('data-table');
+            const tbody = table.getElementsByTagName('tbody')[0];
+            const rows = tbody.getElementsByTagName('tr');
+            const data = [];
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                const key = cells[0].textContent;
+                const value = cells[3].getElementsByTagName('input')[0].value;
+                data.push({
+                    key: key,
+                    value: value
+                });
+            }
+            try {
+                await db.saveWeightsData(data);
+                // Send notification
+                app.notification.create({
+                    title: 'チャットボット',
+                    text: 'データを保存しました。'
+                }).open();
+            } catch (error) {
+                console.error(error);
+                app.notification.create({
+                    title: 'チャットボット',
+                    text: 'データの保存に失敗しました。'
+                }).open();
+            }
+        });
+
         // Table pagination
         tablePrevBtn.addEventListener('click', function () {
             currentTablePage = Math.max(currentTablePage - 1, 0);
@@ -93,6 +128,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         tableNextBtn.addEventListener('click', function () {
             currentTablePage = Math.min(currentTablePage + 1, Math.floor((tableData.length - 1) / rowsPerPage));
+            updateTable();
+        });
+
+        tablePageCountSelect.addEventListener('change', function () {
+            rowsPerPage = parseInt(this.value);
+            if (this.value === 'all') {
+                rowsPerPage = tableData.length;
+            }
+            currentTablePage = 0;
             updateTable();
         });
 
@@ -158,6 +202,10 @@ function updateTable() {
     const nextPageButton = document.getElementById('next-page');
     prevPageButton.classList.toggle('disabled', currentTablePage === 0);
     nextPageButton.classList.toggle('disabled', currentTablePage >= Math.floor((tableData.length - 1) / rowsPerPage));
+
+    // Update page count select
+    const pageCountSelect = document.getElementById('page-count-select');
+    pageCountSelect.value = rowsPerPage === tableData.length ? 'all' : rowsPerPage;
 }
 
 // Validate data

@@ -32,10 +32,16 @@
                 <!-- Top Navbar -->
                 <div class="navbar">
                     <div class="navbar-bg"></div>
-                    <div class="navbar-inner sliding justify-content-center">
-                        <div class="title">チャットボット</div>
-                        <div class="nav-right">
-                            <a href="./admin/" class="link">Admin</a>
+                    <div class="navbar-inner sliding display-flex justify-content-space-between align-items-stretch">
+                        <div class="">
+                            <a id="open-suggestions" href="" class="link sheet-open"
+                                data-sheet=".suggestions-sheet">提案リスト</a>
+                        </div>
+                        <div class="align-self-center">
+                            <h3>チャットボット</h3>
+                        </div>
+                        <div class="">
+                            <a href="./admin/" class="link">管理者</a>
                             <!-- <a class="button button-fill sheet-open" data-sheet=".demo-sheet-top">Top Sheet</a> -->
                         </div>
                     </div>
@@ -47,7 +53,7 @@
                         <div class="toolbar-inner">
                             <div class="left"></div>
                             <div class="right">
-                                <a class="link sheet-close">Close</a>
+                                <a class="link sheet-close"></a>
                             </div>
                         </div>
                     </div>
@@ -80,10 +86,8 @@
                 <div class="toolbar messagebar padding-horizontal-half">
                     <div class="toolbar-inner">
                         <div class="messagebar-area">
-                            <!-- messagebar attachments -->
-                            <div class="messagebar-attachments">...</div>
                             <!-- messagebar resizable textarea -->
-                            <textarea class="resizable" placeholder="メッセージ"></textarea>
+                            <textarea id="message-field" class="resizable" placeholder="メッセージ"></textarea>
                         </div>
                         <a id="send-btn" href="" class="link icon-only">
                             <i class="icon f7-icons">arrow_up_circle_fill</i>
