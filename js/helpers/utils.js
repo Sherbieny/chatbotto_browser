@@ -48,3 +48,13 @@ function hideSpinner(elem) {
         app.dialog.close();
     }
 }
+
+function scrollToBottom(selector) {
+    const elem = document.querySelector(selector);
+    if (elem) {
+        const lastMessage = elem.lastElementChild;
+        if (lastMessage) {
+            lastMessage.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+}
