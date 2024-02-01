@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 name: 'admin',
                 path: '/admin/',
                 async: function ({ resolve }) {
-                    fetch('./admin.html')
+                    fetch(window.location.origin + '/admin.html')
                         .then((res) => res.text())
                         .then(function (html) {
                             resolve({ content: html });
