@@ -6,3 +6,32 @@
 .message-avatar {
     opacity: 1 !important;
 }
+
+#suggestions-list {
+    overflow-x: hidden;
+    /* Prevents horizontal scrolling */
+    white-space: normal;
+    /* Allows text to wrap */
+}
+
+#suggestions-list li {
+    cursor: pointer;
+    color: black;
+    /* Changes text color to black */
+    overflow-wrap: break-word;
+    /* Breaks the word at the end of the line */
+    word-wrap: break-word;
+    /* Breaks the word at the end of the line for older browsers */
+    overflow: visible;
+    /* Clips the text instead of showing an ellipsis */
+    -webkit-line-clamp: none;
+    /* Removes the limit on the number of lines */
+    display: block;
+    /* Changes the display from box to block */
+    max-height: none;
+    /* Removes the maximum height */
+}
+
+.list .item-content {
+    padding-left: 0px !important;
+}
