@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             {
                 name: 'admin',
                 path: '/admin/',
-                url: './admin.html',
+                url: '/admin.html',
             },
         ],
         // loader
