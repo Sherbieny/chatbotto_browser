@@ -152,4 +152,57 @@ class ChatbotIndexedDB {
             }
         });
     }
+
+    async saveSettings(settings) {
+        return new Promise((resolve, reject) => {
+            try {
+                const transaction = this.db.transaction(['chatbotDataStore'], 'readwrite');
+                const store = transaction.objectStore('chatbotDataStore');
+
+                // Save the settings object as a single record with the key 'settings'
+                store.put({ id: 'settings', data: settings });
+
+                transaction.oncomplete = function () {
+                    console.log('Settings saved to IndexedDB');
+                    resolve();
+                };
+
+                transaction.onerror = function () {
+                    reject(new Error("An error occurred while saving settings to IndexedDB"));
+                };
+
+            } catch (error) {
+                console.error(error);
+                reject(new Error('An unexpected error occurred: ' + error));
+            }
+        });
+    }
+
+    async getSettings() {
+        return new Promise((resolve, reject) => {
+            try {
+                const transaction = this.db.transaction(['chatbotDataStore'], 'readonly');
+                const store = transaction.objectStore('chatbotDataStore');
+                const request = store.get('settings');
+
+                request.onsuccess = function (event) {
+                    const data = event.target.result;
+                    if (data === undefined) {
+                        reject(new Error(`No settings found in IndexedDB`));
+                    } else {
+                        console.log('Settings retrieved from IndexedDB');
+                        resolve(data.data);
+                    }
+                };
+
+                request.onerror = function (event) {
+                    reject(new Error("An error occurred while fetching settings from IndexedDB"));
+                };
+
+            } catch (error) {
+                console.error(error);
+                reject(new Error('An unexpected error occurred: ' + error));
+            }
+        });
+    }
 }
