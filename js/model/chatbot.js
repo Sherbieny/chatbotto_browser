@@ -58,8 +58,8 @@ class Chatbot {
         return score;
     }
 
-    getRandomSuggestions() {
-        const prompts = Object.keys(this.qa);
+    async getRandomSuggestions() {
+        const prompts = await this.getChatbotPrompts();
         const suggestions = [];
 
         // If numSuggestions is greater than the number of prompts, reduce it to the number of prompts
@@ -81,7 +81,7 @@ class Chatbot {
     async getSuggestions(userInput) {
 
         if (!userInput) {
-            return this.getRandomSuggestions();
+            return await this.getRandomSuggestions();
         }
 
         const tokenizedInput = this.tokenizer.tokenizeString(userInput);
