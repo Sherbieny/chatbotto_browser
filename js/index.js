@@ -33,14 +33,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             {
                 name: 'admin',
                 path: '/admin/',
-                async: function ({ resolve }) {
-                    fetch(window.location.origin + '/admin.html')
-                        .then((res) => res.text())
-                        .then(function (html) {
-                            resolve({ content: html });
-                        });
-                },
-            }
+                url: './admin.html',
+            },
         ],
         // loader
         dialog: {
