@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const tableNextBtn = document.getElementById('next-page');
         const tablePageCountSelect = document.getElementById('page-count-select');
         const saveTableDataBtn = document.getElementById('save-table-data');
+        const saveSettingsBtn = document.getElementById('save-settings');
 
         uploadWeightsBtn.addEventListener('change', function (event) {
             const file = event.target.files[0];
@@ -158,6 +159,50 @@ document.addEventListener('DOMContentLoaded', function () {
             app.notification.create({
                 title: 'チャットボット',
                 text: 'データの取得に失敗しました。'
+            }).open();
+        }
+
+        // Save settings
+        saveSettingsBtn.addEventListener('click', async function () {
+            const suggestionsCount = document.getElementById('suggestions-count').value;
+            const suggestionsDelay = document.getElementById('suggestions-delay').value;
+
+            try {
+                await db.saveSettings({
+                    suggestionsCount: suggestionsCount,
+                    suggestionsDelay: suggestionsDelay
+                });
+                // Send notification
+                app.notification.create({
+                    title: 'チャットボット',
+                    text: '設定を保存しました。'
+                }).open();
+            } catch (error) {
+                console.error(error);
+                app.notification.create({
+                    title: 'チャットボット',
+                    text: '設定の保存に失敗しました。'
+                }).open();
+            }
+        });
+
+        // Get settings from IndexedDB if available
+        try {
+            db.getSettings().then(settings => {
+                document.getElementById('suggestions-count').value = settings.suggestionsCount;
+                document.getElementById('suggestions-delay').value = settings.suggestionsDelay;
+            }).catch(error => {
+                console.error(error);
+                app.notification.create({
+                    title: 'チャットボット',
+                    text: '設定の取得に失敗しました。'
+                }).open();
+            });
+        } catch (error) {
+            console.error(error);
+            app.notification.create({
+                title: 'チャットボット',
+                text: '設定の取得に失敗しました。'
             }).open();
         }
     });
