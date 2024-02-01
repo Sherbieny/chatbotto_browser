@@ -1,6 +1,6 @@
 # チャットボットアプリ (ブラウザ)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![GitHub repo size](https://img.shields.io/github/repo-size/Sherbieny/chatbot-browser-app) ![GitHub last commit](https://img.shields.io/github/last-commit/Sherbieny/chatbot-browser-app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]
 
 これは、[Chatbotto](https://github.com/Sherbieny/chatbotto)アプリケーションのブラウザベースのバージョンです。
 
@@ -52,7 +52,7 @@ python -m http.server 8000
 
 # Chatbotto Browser App
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![GitHub repo size](https://img.shields.io/github/repo-size/Sherbieny/chatbot-browser-app) ![GitHub last commit](https://img.shields.io/github/last-commit/Sherbieny/chatbot-browser-app)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]
 
 This is a browser-based version of the [Chatbotto](https://github.com/Sherbieny/chatbotto) application.
 
