@@ -1,7 +1,18 @@
-let app, mainView, suggestionsSheet, messages, messageBar, db, chatbot, $$;
+let app, mainView, suggestionsPanel, messages, messageBar, db, chatbot, $$;
 let lastMessageTime = 0;
 let typingTimeout; // Rate limit in milliseconds
-let userInputLimit = 200; // Maximum length of user input
+let suggestionsDelay = 2000; // Delay in milliseconds
+let justSent = false; // Prevents getting suggestions after sending a message
+const people = {
+    user: {
+        type: 'sent',
+        avatar: 'img/user_icon.png'
+    },
+    chatbot: {
+        type: 'received',
+        avatar: 'img/chatbot_icon_1.png'
+    },
+};
 
 document.addEventListener('DOMContentLoaded', async function () {
 
@@ -10,9 +21,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         el: '#app',
         // App Name
         name: 'チャットボット',
-        // Enable swipe panel
+        // Suggestions panel
         panel: {
+            el: '#suggestions-panel',
+            resizable: true,
             swipe: true,
+            swipeOnlyClose: true,
         },
         // Add default routes
         routes: [
@@ -22,13 +36,6 @@ document.addEventListener('DOMContentLoaded', async function () {
                 url: './admin.html',
             },
         ],
-        // suggestions sheet modal
-        sheet: {
-            el: '#suggestions-sheet',
-            backdrop: false,
-            swipeToClose: true,
-            closeByOutsideClick: true,
-        },
         // loader
         dialog: {
             preloaderTitle: '読み込み中...',
@@ -41,25 +48,34 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     $$ = Dom7;
     mainView = app.views.create('.view-main');
-    suggestionsSheet = app.sheet.create({ el: '#suggestions-sheet' });
+    suggestionsPanel = app.panel.create({ el: '#suggestions-panel' });
     messages = app.messages.create({
         el: '.messages',
-        messages: [
-            {
-                text: 'こんにちは！本日はどのようにお手伝いできますか？',
-                type: 'sent',
-                avatar: 'img/chatbot_icon_1.png'
-            },
-            {
-                text: 'こんにちは！',
-                type: 'received',
-                avatar: 'img/user_icon.png'
-            },
-        ]
     });
     messageBar = app.messagebar.create({
         el: '.messagebar',
         attachments: [],
+    });
+
+    messages.addMessage({
+        header: new Date().toLocaleTimeString('ja-JP'),
+        text: 'こんにちは！',
+        type: people.chatbot.type,
+        avatar: people.chatbot.avatar,
+    });
+
+    messages.addMessage({
+        header: new Date().toLocaleTimeString('ja-JP'),
+        text: '私はチャットボットです。何かお困りですか？',
+        type: people.chatbot.type,
+        avatar: people.chatbot.avatar,
+    });
+
+    messages.addMessage({
+        header: new Date().toLocaleTimeString('ja-JP'),
+        text: '質問例を見るには、上記の『提案リスト』を開いてください。',
+        type: people.chatbot.type,
+        avatar: people.chatbot.avatar,
     });
 
     try {
@@ -67,6 +83,17 @@ document.addEventListener('DOMContentLoaded', async function () {
         const chatbotDB = new ChatbotIndexedDB();
         await chatbotDB.init();
         db = chatbotDB;
+
+        // Initialize Chatbot
+        chatbot = new Chatbot(app, db);
+        await chatbot.init();
+
+        // get suggestion delay setting if available
+        const settings = await db.getSettings();
+        if (settings && settings.suggestionsDelay) {
+            suggestionsDelay = settings.suggestionsDelay;
+        }
+
     } catch (error) {
         console.error('Failed to initialize database:', error);
         // Show a notification to the user
@@ -75,48 +102,69 @@ document.addEventListener('DOMContentLoaded', async function () {
             text: 'データベースの初期化に失敗しました。機能が制限される可能性があります。',
             closeTimeout: 3000,
         }).open();
+    } finally {
+        hideSpinner();
     }
-
-    // Initialize Chatbot
-    chatbot = new Chatbot(app, db);
-    await chatbot.init();
-
 
     //Dom Elements
     const sendBtn = document.getElementById('send-btn');
-    const meesageField = document.getElementById('message-field');
+    const messageField = document.getElementById('message-field');
+    const suggestionsListBtn = document.getElementById('open-suggestions');
 
     //Event Listeners
 
     // Send message
-    sendBtn.addEventListener('click', function () {
-        const userInput = meesageField.value;
+    sendBtn.addEventListener('click', async function () {
+        const userInput = messageField.value.trim();
         if (userInput.length === 0) {
             return;
         }
-        chatbot.answer(userInput)
+        messageBar.clear();
+        await chatbot.answer(userInput)
+        justSent = true; // Set the flag to true
     });
-    meesageField.addEventListener('keypress', function (e) {
+
+    messageField.addEventListener('keypress', async function (e) {
         if (e.key === 'Enter') {
-            const userInput = meesageField.value;
+            e.preventDefault();
+            const userInput = messageField.value.trim();
             if (userInput.length === 0) {
                 return;
             }
-            chatbot.answer(userInput)
+            messageBar.clear();
+            await chatbot.answer(userInput)
+            justSent = true; // Set the flag to true
         }
     });
 
     // Finished typing - add suggestions
-    meesageField.addEventListener('change', function (e) {
+    messageField.addEventListener('input', function (e) {
         clearTimeout(typingTimeout);
 
         if (this.value.length > 0) {
-            typingTimeout = setTimeout(() => {
-                chatbot.addSuggestions(this.value);
+            typingTimeout = setTimeout(async () => {
+                if (justSent) { // If the user has just sent a message
+                    justSent = false; // Reset the flag
+                    return; // Exit the function
+                }
+                await chatbot.addSuggestions(this.value);
             }, 2000);
         }
     });
 
-    hideSpinner();
+    // Suggestion list items click event
+    suggestionsPanel.el.querySelector('#suggestions-list').addEventListener('click', async function (e) {
+        const suggestion = e.target.closest('.suggestion-item')?.textContent;
+        if (suggestion) {
+            await chatbot.answer(suggestion);
+        }
+    });
+
+    // Open suggestions sheet and if empty, add random suggestions
+    suggestionsListBtn.addEventListener('click', async function () {
+        if (suggestionsPanel.el.querySelector('#suggestions-list').childElementCount === 0) {
+            await chatbot.addSuggestions();
+        }
+    });
 
 });
