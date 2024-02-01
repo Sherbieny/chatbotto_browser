@@ -4,12 +4,13 @@ class Chatbot {
         this.db = chatbotDBInstance;
         this.qa = []; // Array of question-answer pairs
         this.tokenizer = new Tokenizer(this.db);
+        this.suggestionsCount = 5;
     }
 
     async init() {
         await this.updateChatbotData();  // Get data from IndexedDB
         await this.tokenizer.init();  // Initialize tokenizer
-        // Rest of the initialization code...
+        await this.getSettings();  // Get settings from IndexedDB
 
     }
 
@@ -20,6 +21,13 @@ class Chatbot {
             data.forEach(item => {
                 this.qa[item.prompt] = item.answer;
             });
+        }
+    }
+
+    async getSettings() {
+        const data = await this.db.getSettings();
+        if (data && data.suggestionsCount) {
+            this.suggestionsCount = data.suggestionsCount;
         }
     }
 
@@ -50,7 +58,32 @@ class Chatbot {
         return score;
     }
 
+    getRandomSuggestions() {
+        const prompts = Object.keys(this.qa);
+        const suggestions = [];
+
+        // If numSuggestions is greater than the number of prompts, reduce it to the number of prompts
+        const numSuggestions = Math.min(this.suggestionsCount, prompts.length);
+
+        for (let i = 0; i < numSuggestions; i++) {
+            const randomIndex = Math.floor(Math.random() * prompts.length);
+            const randomPrompt = prompts[randomIndex];
+            suggestions.push(randomPrompt);
+
+            // Remove the selected prompt from the array to avoid duplicates
+            prompts.splice(randomIndex, 1);
+        }
+
+        return suggestions;
+    }
+
+
     async getSuggestions(userInput) {
+
+        if (!userInput) {
+            return this.getRandomSuggestions();
+        }
+
         const tokenizedInput = this.tokenizer.tokenizeString(userInput);
         const suggestions = [];
         const uniqueSuggestions = new Set();
@@ -75,7 +108,7 @@ class Chatbot {
 
         return suggestions
             .sort((a, b) => b.score - a.score)
-            .slice(0, 5)
+            .slice(0, this.suggestionsCount)
             .map(suggestion => suggestion.text);
     }
 
@@ -87,20 +120,76 @@ class Chatbot {
         }
 
         // Clear the previous suggestions
-        suggestionsSheet.$el.find('.block').empty();
+        suggestionsPanel.$el.find('#suggestions-list').empty();
 
         // Add the new suggestions
         suggestions.forEach(suggestion => {
-            suggestionsSheet.$el.find('.block').append(`<p>${suggestion}</p>`);
+            suggestionsPanel.$el.find('#suggestions-list').append(`
+                <li>
+                    <div class="item-content">
+                        <div class="item-media"><i class="icon f7-icons">question_circle_fill</i></div>
+                        <div class="item-inner">
+                            <div class="suggestion-item">${suggestion}</div>
+                        </div>
+                    </div>
+                </li>
+            `);
         });
 
         // Open the suggestions sheet if it's not already open
-        if (!suggestionsSheet.opened) {
-            suggestionsSheet.open();
+        if (!suggestionsPanel.opened) {
+            suggestionsPanel.open();
         }
     }
 
     async answer(userInput) {
-        // Implementation of answer...
+        // Hide the suggestions sheet
+        if (suggestionsPanel.opened) {
+            suggestionsPanel.close();
+        }
+
+        // Add the user message to the chat
+        messages.addMessage({
+            header: new Date().toLocaleTimeString('ja-JP'),
+            text: userInput,
+            type: people.user.type,
+            avatar: people.user.avatar,
+        });
+
+        // Add isTyping message
+        messages.showTyping({
+            avatar: people.chatbot.avatar,
+        });
+
+        // Get the chatbot's answer
+        let answer = this.qa[userInput];
+        if (!answer) {
+            const suggestions = await this.getSuggestions(userInput);
+            if (suggestions.length > 0) {
+                answer = this.qa[suggestions[0]];
+            }
+        }
+
+        if (!answer) {
+            answer = 'すみません、よくわかりませんでした。';
+        }
+
+        // Simulate a delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Hide the isTyping message
+        messages.hideTyping();
+
+        // Add the chatbot's answer to the chat
+        messages.addMessage({
+            header: new Date().toLocaleTimeString('ja-JP'),
+            text: answer,
+            type: people.chatbot.type,
+            avatar: people.chatbot.avatar,
+        });
+
+
+
+        scrollToBottom('.messages-content');
     }
 }
