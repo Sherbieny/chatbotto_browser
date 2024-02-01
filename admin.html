@@ -58,7 +58,7 @@
                             <tr>
                                 <th class="label-cell">ID</th>
                                 <th class="label-cell">ラベル (EN)</th>
-                                <th class="label-cell">ラベル (JP)</th>
+                                <th class="label-cell">ラベル (JA)</th>
                                 <th class="label-cell">操作</th>
                             </tr>
                         </thead>
@@ -106,9 +106,19 @@
                                         </div>
                                     </div>
                                 </li>
+                                <li>
+                                    <div class="item-content item-input">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">提案の遅延（秒）</div>
+                                            <div class="item-input-wrap">
+                                                <input type="text" id="suggestions-delay" value="2">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
                             </ul>
                             <div class="block">
-                                <button class="button button-fill">設定を保存</button>
+                                <button id="save-settings" class="button button-fill">設定を保存</button>
                             </div>
                         </div>
                     </div>

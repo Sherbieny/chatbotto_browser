@@ -32,34 +32,29 @@
                 <!-- Top Navbar -->
                 <div class="navbar">
                     <div class="navbar-bg"></div>
-                    <div class="navbar-inner sliding display-flex justify-content-space-between align-items-stretch">
+                    <div
+                        class="padding-horizontal-half navbar-inner sliding display-flex justify-content-space-between align-items-stretch">
                         <div class="">
-                            <a id="open-suggestions" href="" class="link sheet-open"
-                                data-sheet=".suggestions-sheet">提案リスト</a>
+                            <a id="open-suggestions" class="margin-top-half button button-fill panel-open"
+                                data-panel="#suggestions-panel">提案リスト</a>
                         </div>
                         <div class="align-self-center">
                             <h3>チャットボット</h3>
                         </div>
                         <div class="">
-                            <a href="./admin/" class="link">管理者</a>
+                            <a href="./admin/" class="margin-top-half button button-fill">管理者</a>
                             <!-- <a class="button button-fill sheet-open" data-sheet=".demo-sheet-top">Top Sheet</a> -->
                         </div>
                     </div>
                 </div>
 
-                <!-- Suggestions Top Sheet Modal  -->
-                <div id="suggestions-sheet" class="sheet-modal sheet-modal-top suggestions-sheet">
-                    <div class="toolbar toolbar-bottom">
-                        <div class="toolbar-inner">
-                            <div class="left"></div>
-                            <div class="right">
-                                <a class="link sheet-close"></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="sheet-modal-inner">
-                        <div class="page-content">
-                            <div class="block">
+                <!-- Suggestions Side Panel  -->
+                <div id="suggestions-panel" class="panel panel-left panel-cover">
+                    <div class="page-content">
+                        <div class="block">
+                            <div class="list list-strong list-outline list-dividers">
+                                <ul id="suggestions-list">
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -70,15 +65,7 @@
                 <div class="page-content messages-content">
                     <div class="block block-strong inset">
                         <!-- Chat window -->
-                        <div class="messages">
-                            <!-- Date stamp -->
-                            <div class="messages-title"><b>
-                                    <script>document.write(new Date().toLocaleString())</script>
-                                </b></div>
-
-                            <!-- Message -->
-
-                        </div>
+                        <div class="messages"></div>
                     </div>
                 </div>
 
