@@ -84,6 +84,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         await chatbotDB.init();
         db = chatbotDB;
 
+        // Check if the database is empty
+        if (await db.isEmpty()) {
+            await db.populateSampleData();
+        }
+
         // Initialize Chatbot
         chatbot = new Chatbot(app, db);
         await chatbot.init();

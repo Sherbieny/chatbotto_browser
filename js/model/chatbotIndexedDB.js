@@ -205,4 +205,54 @@ class ChatbotIndexedDB {
             }
         });
     }
+
+    async isEmpty() {
+        return new Promise((resolve, reject) => {
+            try {
+                const transaction = this.db.transaction(['chatbotDataStore'], 'readonly');
+                const store = transaction.objectStore('chatbotDataStore');
+                const request = store.count();
+
+                request.onsuccess = function (event) {
+                    const count = event.target.result;
+                    if (count === 0) {
+                        console.log('Database is empty');
+                        resolve(true);
+                    } else {
+                        console.log('Database is not empty');
+                        resolve(false);
+                    }
+                };
+
+                request.onerror = function (event) {
+                    reject(new Error("An error occurred while checking if the database is empty"));
+                };
+
+            } catch (error) {
+                console.error(error);
+                reject(new Error('An unexpected error occurred: ' + error));
+            }
+        });
+    }
+
+    async populateSampleData() {
+        // Sample data files are located in the 'sample_data' folder
+        // qa_data.json: chatbot data
+        // weights.json: weights data
+
+        try {
+            // Load chatbot data
+            const qaData = await fetch('sample_data/qa_data.json');
+            const qaJson = await qaData.json();
+            await this.saveChatbotData(qaJson);
+
+            // Load weights data
+            const weightsData = await fetch('sample_data/weights.json');
+            const weightsJson = await weightsData.json();
+            await this.saveWeightsData(weightsJson);
+        } catch (error) {
+            console.error(error);
+            throw new Error('An unexpected error occurred while loading sample data: ' + error);
+        }
+    }
 }
