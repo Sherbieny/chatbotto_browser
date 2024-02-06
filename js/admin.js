@@ -33,14 +33,15 @@ document.addEventListener('chatbotInitComplete', function () {
                 // validate data
                 validateData(data, 'weights');
                 await db.saveWeightsData(data);
+                tableData = data;
+                // Update table data
+                updateTable();
+
                 // Send notification
                 app.notification.create({
                     title: 'チャットボット',
                     text: 'データをアップロードしました。'
                 }).open();
-
-                // Update table data
-                updateTable();
             } catch (error) {
                 console.error(error);
                 app.notification.create({
@@ -73,6 +74,7 @@ document.addEventListener('chatbotInitComplete', function () {
                 // validate data
                 validateData(data, 'qa');
                 await db.saveChatbotData(data);
+
                 // Send notification
                 app.notification.create({
                     title: 'チャットボット',
