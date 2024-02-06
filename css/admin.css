@@ -11,6 +11,10 @@
     font-size: 16px;
 }
 
+.admin-panel {
+    --f7-panel-width: 80% !important;
+}
+
 /* Styles for viewports less than 600px wide */
 @media (max-width: 600px) {
 
@@ -28,12 +32,5 @@
     .data-table th {
         padding: 5px;
         font-size: 12px;
-    }
-}
-
-/* Styles for Desktop only */
-@media (min-width: 1024px) {
-    .admin-panel {
-        --f7-panel-width: 80% !important;
     }
 }
