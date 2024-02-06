@@ -6,7 +6,7 @@
 
 ## デモ
 
-[ライブデモ](https://sherbieny.github.io/chatbotto-browser/)
+[ライブデモ](https://sherbieny.github.io/chatbotto_browser/)
 
 ## 使用されたライブラリ
 
@@ -64,7 +64,7 @@ This is a browser-based version of the [Chatbotto](https://github.com/Sherbieny/
 
 ## Demo
 
-[Live Demo](https://sherbieny.github.io/chatbotto-browser/)
+[Live Demo](https://sherbieny.github.io/chatbotto_browser/)
 
 ## Libraries Used
 
