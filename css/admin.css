@@ -30,3 +30,10 @@
         font-size: 12px;
     }
 }
+
+/* Styles for Desktop only */
+@media (min-width: 1024px) {
+    .admin-panel {
+        --f7-panel-width: 80% !important;
+    }
+}

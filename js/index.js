@@ -106,6 +106,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         hideSpinner();
     }
 
+    //Send custom chatbotInitComplete event
+    const chatbotInitCompleteEvent = new CustomEvent('chatbotInitComplete');
+    document.dispatchEvent(chatbotInitCompleteEvent);
+
     //Dom Elements
     const sendBtn = document.getElementById('send-btn');
     const messageField = document.getElementById('message-field');

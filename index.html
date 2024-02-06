@@ -42,7 +42,8 @@
                             <h3>チャットボット</h3>
                         </div>
                         <div class="">
-                            <a href="./admin/" class="margin-top-half button button-fill">管理者</a>
+                            <a href="#" data-panel=".panel-right"
+                                class="margin-top-half button button-fill panel-open">管理者</a>
                             <!-- <a class="button button-fill sheet-open" data-sheet=".demo-sheet-top">Top Sheet</a> -->
                         </div>
                     </div>
@@ -59,7 +60,6 @@
                         </div>
                     </div>
                 </div>
-
 
                 <!-- Chat Window -->
                 <div class="page-content messages-content">
@@ -82,6 +82,129 @@
                     </div>
                     <!-- messagebar sheet -->
                     <div class="messagebar-sheet">...</div>
+                </div>
+
+                <!-- Admin Panel -->
+                <div class="panel panel-right panel-cover panel-init admin-panel">
+                    <div class="page-content">
+                        <div id="admin-panel" class="block">
+                            <!-- File Upload Section -->
+                            <div class="card">
+                                <div class="card-header">データのアップロード (CSV/JSON)</div>
+                                <div class="card-content">
+                                    <div class="card-content-inner">
+                                        <div class="grid grid-gap grid-cols-2">
+                                            <div>
+                                                <input type="file" id="csv-upload-weights" accept=".csv,.json"
+                                                    style="display: none;">
+                                                <label for="csv-upload-weights" class="button button-small button-fill"
+                                                    style="white-space: normal;">
+                                                    <icon class="f7-icons" style="margin-right: 10px;">cloud_upload_fill
+                                                    </icon> BCCWJ
+                                                </label>
+                                            </div>
+                                            <div>
+                                                <input type="file" id="csv-upload-qa" accept=".csv,.json"
+                                                    style="display: none;">
+                                                <label for="csv-upload-qa" class="button button-small button-fill"
+                                                    style="white-space: normal;">
+                                                    <icon class="f7-icons" style="margin-right: 10px;">cloud_upload_fill
+                                                    </icon> QA
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Data Table Section -->
+                            <div class="data-table data-table-init card">
+                                <div class="card-header">
+                                    <div class="data-table-header">
+                                        <div class="data-table-title">日本語品詞リストと対応する BCCWJ の品詞名</div>
+                                        <div class="data-table-actions">
+                                            <!-- <span class="data-table-action-label">保存</span> -->
+                                            <a id="save-table-data" class="button button-fill">
+                                                保存
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-content">
+                                    <table id="data-table">
+                                        <!-- Header -->
+                                        <thead>
+                                            <tr>
+                                                <th class="label-cell">ID</th>
+                                                <th class="label-cell">ラベル (EN)</th>
+                                                <th class="label-cell">ラベル (JA)</th>
+                                                <th class="label-cell">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                    <div class="data-table-footer">
+                                        <div class="data-table-rows-select">
+                                            <div class="input input-dropdown">
+                                                <select id="page-count-select">
+                                                    <option value="5">5</option>
+                                                    <option value="10">10</option>
+                                                    <option value="25">25</option>
+                                                    <option value="all">全て</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="data-table-pagination">
+                                            <span class="data-table-pagination-label">1-5 of 10</span>
+                                            <a id="prev-page" href="#" class="link">
+                                                <i class="icon icon-prev color-gray"></i>
+                                            </a>
+                                            <a id="next-page" href="#" class="link">
+                                                <i class="icon icon-next color-gray"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Settings Section -->
+                            <div class="card">
+                                <div class="card-header">追加設定</div>
+                                <div class="card-content">
+                                    <div class="card-content-inner">
+                                        <div class="list no-hairlines-md">
+                                            <ul>
+                                                <li>
+                                                    <div class="item-content item-input">
+                                                        <div class="item-inner">
+                                                            <div class="item-title item-label">提案の数</div>
+                                                            <div class="item-input-wrap">
+                                                                <input type="text" id="suggestions-count" value="5">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="item-content item-input">
+                                                        <div class="item-inner">
+                                                            <div class="item-title item-label">提案の遅延（秒）</div>
+                                                            <div class="item-input-wrap">
+                                                                <input type="text" id="suggestions-delay" value="2">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                            <div class="block">
+                                                <button id="save-settings" class="button button-fill">設定を保存</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
