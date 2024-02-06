@@ -4,6 +4,10 @@
 
 これは、[Chatbotto](https://github.com/Sherbieny/chatbotto)アプリケーションのブラウザベースのバージョンです。
 
+## デモ
+
+[ライブデモ](https://sherbieny.github.io/chatbotto-browser/)
+
 ## 使用されたライブラリ
 
 - [Framework7](https://framework7.io/): モバイルファーストデザインを作成するために使用されます。
@@ -57,6 +61,10 @@ python -m http.server 8000
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)]
 
 This is a browser-based version of the [Chatbotto](https://github.com/Sherbieny/chatbotto) application.
+
+## Demo
+
+[Live Demo](https://sherbieny.github.io/chatbotto-browser/)
 
 ## Libraries Used
 
