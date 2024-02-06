@@ -42,6 +42,11 @@ document.addEventListener('DOMContentLoaded', async function () {
             progressTitle: '読み込み中...',
             buttonOk: 'OK',
         },
+        // notification
+        notification: {
+            title: 'チャットボット',
+            closeTimeout: 3000,
+        },
     });
 
     showSpinner();
@@ -103,9 +108,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         console.error('Failed to initialize database:', error);
         // Show a notification to the user
         app.notification.create({
-            title: 'チャットボット',
             text: 'データベースの初期化に失敗しました。機能が制限される可能性があります。',
-            closeTimeout: 3000,
         }).open();
     } finally {
         hideSpinner();
@@ -119,6 +122,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const sendBtn = document.getElementById('send-btn');
     const messageField = document.getElementById('message-field');
     const suggestionsListBtn = document.getElementById('open-suggestions');
+    const refreshSuggestionsBtn = document.getElementById('refresh-suggestions');
 
     //Event Listeners
 
@@ -174,6 +178,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (suggestionsPanel.el.querySelector('#suggestions-list').childElementCount === 0) {
             await chatbot.addSuggestions();
         }
+    });
+
+    // Refresh suggestions list
+    refreshSuggestionsBtn.addEventListener('click', async function () {
+        await chatbot.addSuggestions();
     });
 
 });
