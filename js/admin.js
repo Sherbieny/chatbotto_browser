@@ -14,8 +14,9 @@ document.addEventListener('chatbotInitComplete', function () {
     uploadWeightsBtn.addEventListener('change', function (event) {
         const file = event.target.files[0];
         const reader = new FileReader();
-        reader.readAsText(file);
         reader.onload = async function (event) {
+            showSpinner('#data-table');
+
             let data;
             if (file.name.endsWith('.json')) {
                 data = JSON.parse(event.target.result);
@@ -39,23 +40,25 @@ document.addEventListener('chatbotInitComplete', function () {
 
                 // Send notification
                 app.notification.create({
-                    title: 'チャットボット',
                     text: 'データをアップロードしました。'
                 }).open();
             } catch (error) {
                 console.error(error);
                 app.notification.create({
-                    title: 'チャットボット',
                     text: 'データのアップロードに失敗しました。'
                 }).open();
+            } finally {
+                hideSpinner('#data-table');
             }
         };
+
+        reader.readAsText(file);
+        event.target.value = '';
     });
 
     uploadQABtn.addEventListener('change', function (event) {
         const file = event.target.files[0];
         const reader = new FileReader();
-        reader.readAsText(file);
         reader.onload = async function (event) {
             let data;
             if (file.name.endsWith('.json')) {
@@ -74,20 +77,23 @@ document.addEventListener('chatbotInitComplete', function () {
                 // validate data
                 validateData(data, 'qa');
                 await db.saveChatbotData(data);
+                // Refresh suggestions list
+                await chatbot.addSuggestions();
 
                 // Send notification
                 app.notification.create({
-                    title: 'チャットボット',
                     text: 'データをアップロードしました。'
                 }).open();
             } catch (error) {
                 console.error(error);
                 app.notification.create({
-                    title: 'チャットボット',
                     text: 'データのアップロードに失敗しました。'
                 }).open();
             }
         };
+
+        reader.readAsText(file);
+        event.target.value = '';
     });
 
     // Save table data
@@ -110,13 +116,11 @@ document.addEventListener('chatbotInitComplete', function () {
             await db.saveWeightsData(data);
             // Send notification
             app.notification.create({
-                title: 'チャットボット',
                 text: 'データを保存しました。'
             }).open();
         } catch (error) {
             console.error(error);
             app.notification.create({
-                title: 'チャットボット',
                 text: 'データの保存に失敗しました。'
             }).open();
         }
@@ -150,7 +154,6 @@ document.addEventListener('chatbotInitComplete', function () {
         }).catch(error => {
             console.error(error);
             app.notification.create({
-                title: 'チャットボット',
                 text: 'データの取得に失敗しました。'
             }).open();
 
@@ -158,7 +161,6 @@ document.addEventListener('chatbotInitComplete', function () {
     } catch (error) {
         console.error(error);
         app.notification.create({
-            title: 'チャットボット',
             text: 'データの取得に失敗しました。'
         }).open();
     }
@@ -173,15 +175,20 @@ document.addEventListener('chatbotInitComplete', function () {
                 suggestionsCount: suggestionsCount,
                 suggestionsDelay: suggestionsDelay
             });
+
+            // Update suggestions list if count has changed
+            if (suggestionsCount !== chatbot.suggestionsCount) {
+                chatbot.suggestionsCount = suggestionsCount;
+                await chatbot.addSuggestions();
+            }
+
             // Send notification
             app.notification.create({
-                title: 'チャットボット',
                 text: '設定を保存しました。'
             }).open();
         } catch (error) {
             console.error(error);
             app.notification.create({
-                title: 'チャットボット',
                 text: '設定の保存に失敗しました。'
             }).open();
         }
@@ -195,14 +202,12 @@ document.addEventListener('chatbotInitComplete', function () {
         }).catch(error => {
             console.error(error);
             app.notification.create({
-                title: 'チャットボット',
                 text: '設定の取得に失敗しました。'
             }).open();
         });
     } catch (error) {
         console.error(error);
         app.notification.create({
-            title: 'チャットボット',
             text: '設定の取得に失敗しました。'
         }).open();
     }

@@ -216,10 +216,9 @@ class ChatbotIndexedDB {
                 request.onsuccess = function (event) {
                     const count = event.target.result;
                     if (count === 0) {
-                        console.log('Database is empty');
+                        console.log('Database is empty -- loading sample data');
                         resolve(true);
                     } else {
-                        console.log('Database is not empty');
                         resolve(false);
                     }
                 };

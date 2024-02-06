@@ -113,7 +113,14 @@ class Chatbot {
     }
 
     async addSuggestions(userInput) {
+
+        if (suggestionsPanel.opened) {
+            showSpinner(suggestionsPanel.$el[0]);
+        }
+
         const suggestions = await this.getSuggestions(userInput);
+
+        hideSpinner(suggestionsPanel.$el[0]);
 
         if (suggestions.length === 0) {
             return;
@@ -135,6 +142,7 @@ class Chatbot {
                 </li>
             `);
         });
+
 
         // Open the suggestions sheet if it's not already open
         if (!suggestionsPanel.opened) {
